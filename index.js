@@ -28,7 +28,7 @@ const onHealthcheckRequest = async (req, res) => {
     return;
   }
   res.writeHead(responseStatus, { 'Content-Type': 'text/plain' });
-  res.end(JSON.stringify(isSyncing ? syncing : 0));
+  res.end(JSON.stringify(syncing ? syncing : 0));
 };
 
 http.createServer(onHealthcheckRequest)
