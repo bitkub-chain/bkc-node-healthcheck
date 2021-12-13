@@ -5,6 +5,7 @@ const http = require('http');
 
 const port = process.env.PORT || 80
 const url = process.env.RPC_URL || 'http://localhost:8545';
+const MAX_BLOCK_DIFFERENCE = process.env.MAX_BLOCK_DIFFERENCE || 3;
 
 const web3 = new Web3(url);
 
@@ -13,11 +14,11 @@ const onHealthcheckRequest = async (req, res) => {
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
   let responseStatus = 200
-  let isSyncing
+  let syncing
   try {
-    isSyncing = await web3.eth.isSyncing()
-    if (isSyncing) {
-      responseStatus = 500;
+    syncing = await web3.eth.isSyncing()
+    if (!!syncing) {
+      responseStatus = syncing.highestBlock - syncing.currentBlock > MAX_BLOCK_DIFFERENCE ? 500 : 200;
     }
   } catch (error) {
     console.log(`Fetch local ${url}, error: Cannot connect local.`)
@@ -27,7 +28,7 @@ const onHealthcheckRequest = async (req, res) => {
     return;
   }
   res.writeHead(responseStatus, { 'Content-Type': 'text/plain' });
-  res.end(JSON.stringify(isSyncing));
+  res.end(JSON.stringify(isSyncing ? syncing : 0));
 };
 
 http.createServer(onHealthcheckRequest)

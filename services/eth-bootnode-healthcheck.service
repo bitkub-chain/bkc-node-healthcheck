@@ -7,6 +7,7 @@ Wants=network.target
 ExecStart=/usr/bin/eth-bootnode-healthcheck-linux-x64
 Restart=always
 RestartSec=5s
+Environment="MAX_BLOCK_DIFFERENCE=3"
 
 [Install]
 WantedBy=default.target 
