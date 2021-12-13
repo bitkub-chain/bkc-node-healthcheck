@@ -22,9 +22,10 @@ const onHealthcheckRequest = async (req, res) => {
     }
   } catch (error) {
     console.log(`Fetch local ${url}, error: Cannot connect local.`)
-    console.error(e);
+    console.error(error);
+    
     res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end(e);
+    res.end(error);
     return;
   }
   res.writeHead(responseStatus, { 'Content-Type': 'text/plain' });
