@@ -1,0 +1,14 @@
+[Unit]
+Description=eth-bootnode-healthcheck
+After=network.target auditd.service
+Wants=network.target
+
+[Service]
+ExecStart=/usr/bin/eth-bootnode-healthcheck-linux-x64
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=default.target 
+RequiredBy=swarm.service
+Alias=eth-bootnode-healthcheck

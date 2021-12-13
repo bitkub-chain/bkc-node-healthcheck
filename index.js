@@ -1,51 +1,33 @@
 #!/usr/bin/env node
 
-const ethers = require('ethers');
+const Web3 = require('web3')
 const http = require('http');
 
 const port = process.env.PORT || 80
 const url = process.env.RPC_URL || 'http://localhost:8545';
-const network = process.env.NETWORK_URL || 'https://rpc.bitkubchain.io';
 
-const localProvider = new ethers.providers.JsonRpcProvider(url);
-const MAX_BLOCK_DIFFERENCE = process.env.MAX_BLOCK_DIFFERENCE || 3;
+const web3 = new Web3(url);
 
 const onHealthcheckRequest = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-  let localBlockNum;
-  let networkBlockNum;
-
+  let responseStatus = 200
+  let isSyncing
   try {
-    const provider = new ethers.providers.JsonRpcProvider(network);
-    networkBlockNum = await provider.getBlockNumber();
+    isSyncing = await web3.eth.isSyncing()
+    if (isSyncing) {
+      responseStatus = 500;
+    }
   } catch (error) {
-    console.log(`Fetch network ${network}, error: Cannot connect network.`)
-    console.error(e);
-    networkBlockNum = 0;
-  }
-
-  try {
-    localBlockNum = await localProvider.getBlockNumber();
-  } catch (e) {
     console.log(`Fetch local ${url}, error: Cannot connect local.`)
     console.error(e);
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end(e);
     return;
   }
-
-  console.log(`Fetch network ${network} -> local ${url}, last block: ${networkBlockNum} --> ${localBlockNum}`)
-
-  let responseStatus = networkBlockNum - localBlockNum > MAX_BLOCK_DIFFERENCE ? 500 : 200;
-  if (localBlockNum > 10000 && networkBlockNum <= 0) { // don't let etherscan f**k us
-    responseStatus = 200;
-  } else if (networkBlockNum < localBlockNum) {
-    responseStatus = 200;
-  }
   res.writeHead(responseStatus, { 'Content-Type': 'text/plain' });
-  res.end((localBlockNum - networkBlockNum).toString());
+  res.end(JSON.stringify(isSyncing));
 };
 
 http.createServer(onHealthcheckRequest)

@@ -9,15 +9,15 @@
     "name": "Isman Usoh"
   },
   "bin": {
-    "eth-node-healthcheck": "./index.js"
+    "eth-bootnode-healthcheck": "./index.js"
   },
   "scripts": {
-    "build": "pkg --targets linux-x64 -o eth-node-healthcheck-linux-x64  .",
+    "build": "pkg --targets linux-x64 -o eth-bootnode-healthcheck-linux-x64  .",
     "printenv": "printenv"
   },
   "license": "MIT",
   "dependencies": {
-    "ethers": "^4.0.27"
+    "web3": "^1.6.1"
   },
   "devDependencies": {
     "pkg": "^5.4.1"
