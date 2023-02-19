@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "Simple http server to monitor if Geth/Parity is in sync with the blockchain",
   "main": "index.js",
-  "repository": "git@github.com:isman-usoh/bkc-node-healthcheck.git",
+  "repository": "git@github.com:bitkub-chain/bkc-node-healthcheck.git",
   "author": {
     "email": "isman.usoh@gmail.com",
     "name": "Isman Usoh"
@@ -12,6 +12,7 @@
     "bkc-node-healthcheck": "./index.js"
   },
   "scripts": {
+    "start": "node index.js",
     "build-x86": "pkg --targets linux-x64 -o ./bin/bkc-node-healthcheck-linux-x64  .",
     "build-arm64": "pkg --targets linux-arm64 -o ./bin/bkc-node-healthcheck-linux-arm64  .",
     "printenv": "printenv"
