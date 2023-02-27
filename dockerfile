@@ -8,5 +8,9 @@ RUN npm install
 
 COPY . /usr/src/app
 
+ENV RPC_URL=http://localhost:8545
+ENV NETWORK_URLS=https://rpc.bitkubchain.io
+ENV PORT=80
+
 EXPOSE 80
 CMD ["npm","start"]
