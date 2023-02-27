@@ -24,7 +24,7 @@ const onHealthcheckRequest = async (req, res) => {
 
   let localBlockNum;
   let networkBlockNum;
-  const networkRpcIndex = ramdomBetween(0, networks.length)
+  const networkRpcIndex = ramdomBetween(0, networkRpcUrls.length)
   const networkRpcUrl = networkRpcUrls[networkRpcIndex]
 
   try {
