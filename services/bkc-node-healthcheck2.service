@@ -7,7 +7,7 @@ Wants=network.target
 ExecStart=/usr/bin/bkc-node-healthcheck-linux-x64
 Restart=always
 RestartSec=5s
-Environment="NETWORK_URLS=https://rpc.bitkubchain.io"
+Environment="NETWORK_URLS=http://bbt-testnet-bootnode.th1.proen.cloud"
 Environment="MAX_BLOCK_DIFFERENCE=3"
 
 [Install]
