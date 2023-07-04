@@ -4,51 +4,48 @@ const ethers = require('ethers');
 const http = require('http');
 
 const port = process.env.PORT || 80
-const url = process.env.RPC_URL || 'http://localhost:8545';
-const networkString = process.env.NETWORK_URL || 'https://rpc.bitkubchain.io';
-const networks = networkString.split(',')
+const localRpcUrl = process.env.RPC_URL || 'http://localhost:8545';
+const networkRpcUrls = (process.env.NETWORK_URLS || 'https://rpc.bitkubchain.io').split(',')
 
-const localProvider = new ethers.providers.JsonRpcProvider(url);
 const MAX_BLOCK_DIFFERENCE = process.env.MAX_BLOCK_DIFFERENCE || 3;
 
-let networkIndex = 0
-const getPublicNetworkBlockNum = async () => {
-  const provider = new ethers.providers.JsonRpcProvider(networks[networkIndex]);
-  const publicBlockNum = await provider.getBlockNumber();
-  if (networks.length <= networkIndex) {
-    networkIndex = 0
-  } else {
-    networkIndex++
-  }
-  return publicBlockNum
+const getNetworkBlockNum = async (rpcUrl) => {
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  return provider.getBlockNumber();
 }
- 
+
+const ramdomBetween = (min, max) => {  
+  return Math.floor(Math.random() * (max - min) + min)
+}
+
 const onHealthcheckRequest = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
   let localBlockNum;
   let networkBlockNum;
+  const networkRpcIndex = ramdomBetween(0, networkRpcUrls.length)
+  const networkRpcUrl = networkRpcUrls[networkRpcIndex]
 
   try {
-    networkBlockNum = await getPublicNetworkBlockNum()
+    networkBlockNum = await getNetworkBlockNum(networkRpcUrl)
   } catch (error) {
-    console.log(`Fetch network ${network}, error: Cannot connect network.`)
+    console.log(`Fetch network ${networks[networkIndex]}, error: Cannot connect network.`)
     console.error(e);
     networkBlockNum = 0;
   }
 
   try {
-    localBlockNum = await localProvider.getBlockNumber();
+    localBlockNum = await getNetworkBlockNum(localRpcUrl)
   } catch (e) {
-    console.log(`Fetch local ${url}, error: Cannot connect local.`)
+    console.log(`Fetch local ${networkRpcUrl}, error: Cannot connect local.`)
     console.error(e);
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end(e);
     return;
   }
 
-  console.log(`Fetch network ${network} -> local ${url}, last block: ${networkBlockNum} --> ${localBlockNum}`)
+  console.log(`Fetch network ${networkRpcUrl} -> local ${localRpcUrl}, last block: ${networkBlockNum} --> ${localBlockNum}`)
 
   let responseStatus = networkBlockNum - localBlockNum > MAX_BLOCK_DIFFERENCE ? 500 : 200;
   if (localBlockNum > 10000 && networkBlockNum <= 0) { // don't let etherscan f**k us
